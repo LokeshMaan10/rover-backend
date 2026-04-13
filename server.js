@@ -3,41 +3,47 @@ const cors = require('cors');
 
 const app = express();
 
+// ✅ Middleware
 app.use(cors());
 app.use(express.json());
 
+// ===== GLOBAL STORAGE =====
 let latestData = {};
 let control = 1;
 
-// ✅ ESP32 sends data
+// ===== ESP32 SEND DATA =====
 app.post('/data', (req, res) => {
     latestData = req.body;
-    console.log("ESP32:", latestData);
+    console.log("ESP32 Data Received:", latestData);
     res.send("OK");
 });
 
-// ✅ Dashboard gets data
+// ===== DASHBOARD GET DATA =====
 app.get('/data', (req, res) => {
+    console.log("Sending to Dashboard:", latestData); // 🔥 debug
     res.json(latestData);
 });
 
-// ✅ Dashboard sends control
+// ===== DASHBOARD SEND CONTROL =====
 app.post('/control', (req, res) => {
     control = req.body.state;
-    console.log("Control:", control);
+    console.log("Control Updated:", control);
     res.send("OK");
 });
 
-// ✅ ESP32 reads control
+// ===== ESP32 READ CONTROL =====
 app.get('/control', (req, res) => {
     res.json({ state: control });
 });
 
-// ✅ Health check (important for deployment)
+// ===== HEALTH CHECK =====
 app.get('/', (req, res) => {
     res.send("Server running 🚀");
 });
 
-app.listen(5000, () => {
-    console.log("Server started on port 5000");
+// ===== IMPORTANT FOR RENDER =====
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+    console.log("Server running on port", PORT);
 });
